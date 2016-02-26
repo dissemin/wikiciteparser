@@ -7,12 +7,42 @@ import lupa
 import json
 import mwparserfromhell
 from time import sleep
-lua = lupa.LuaRuntime()
 
+lua = lupa.LuaRuntime()
 luacode = ''
 luafilepath = os.path.join(os.path.dirname(__file__), 'cs1.lua')
 with open(luafilepath, 'r') as f:
     luacode = f.read()
+
+# taken from https://en.wikipedia.org/wiki/Help:Citation_Style_1
+citation_template_names = set([
+    'Citation',
+    'Cite AV media',
+    'Cite AV media notes',
+    'Cite book',
+    'Cite conference',
+    'Cite DVD notes',
+    'Cite encyclopedia',
+    'Cite episode',
+    'Cite interview',
+    'Cite journal',
+    'Cite mailing list',
+    'Cite map',
+    'Cite news',
+    'Cite newsgroup',
+    'Cite podcast',
+    'Cite press release',
+    'Cite report',
+    'Cite serial',
+    'Cite sign',
+    'Cite speech',
+    'Cite techreport',
+    'Cite thesis',
+    'Cite web',
+    'Cite arXiv',
+    # TODO more could be added,
+    # see https://en.wikipedia.org/wiki/Category:Citation_Style_1_specific-source_templates
+    ])
 
 # MediaWiki utilities simulated by Python wrappers
 def lua_to_python_re(regex):
@@ -84,10 +114,15 @@ def toPyDict(lua_val):
     else:
         return lua_val
 
-def parse_citation_template(arguments):
+def parse_citation_dict(arguments, template_name='citation'):
     """
-    Parses the citation represented by the arguments provided.
+    Parses the Wikipedia citation into a python dict.
+
+    :param arguments: a dictionary with the arguments of the citation template
+    :param template_name: the name of the template used (e.g. 'cite journal', 'citation', and so on)
+    :returns: a dictionary used as internal representation in wikipedia for rendering and export to other formats
     """
+    arguments['_tpl'] = template_name
     lua_table = lua.table_from(arguments)
     lua_result = lua.eval(luacode)(lua_table,
             ustring_match,
@@ -97,17 +132,40 @@ def parse_citation_template(arguments):
             nowiki)
     return toPyDict(lua_result)
 
-
-def parse_citation(arguments, template_name='citation'):
+def params_to_dict(params):
     """
-    Parses the Wikipedia citation into a python dict.
-
-    :param arguments: a dictionary with the arguments of the citation template
-    :param template_name: the name of the template used (e.g. 'cite journal', 'citation', and so on)
-    :returns: a dictionary used as internal representation in wikipedia for rendering and export to other formats
+    Converts the parameters of a mwparserfromhell template to a dictionary
     """
-    args = arguments.copy()
-    args['_tpl'] = template_name
-    return parse_citation_template
+    dct = {}
+    for param in params:
+        dct[param.name.strip()] = param.value.strip()
+    return dct
+
+def is_citation_template_name(template_name):
+    """
+    Is this name the name of a citation template?
+    If true, returns a normalized version of it. Otherwise, returns None
+    """
+    if not template_name:
+        return False
+    template_name = template_name.replace('_', ' ')
+    template_name = template_name.strip()
+    template_name = template_name[0].upper()+template_name[1:]
+    if template_name in citation_template_names:
+        return template_name
+
+def parse_citation_template(template):
+    """
+    Takes a mwparserfromhell template object that represents
+    a wikipedia citation, and converts it to a normalized representation
+    as a dict.
+
+    :returns: a dict representing the template, or None if the template provided
+        does not represent a citation.
+    """
+    name = unicode(template.name)
+    if not is_citation_template_name(name):
+        return
+    return parse_citation_dict(params_to_dict(template.params), template_name=name)
 
 
