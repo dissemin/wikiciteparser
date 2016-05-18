@@ -7,6 +7,8 @@ This Python library wraps Wikipedia's citation processing code (written in Lua) 
 parse citation templates. For instance, there are many different ways to specify the
 authors of a citation: this codes maps all of them to the same representation.
 
+This is the underlying code of our ["OAbot"](https://tools.wmflabs.org/oabot/) ([GitHub](https://github.com/dissemin/oabot)).
+
 Distributed under the MIT license.
 
 Dependencies: lupa, mwparserfromhell
