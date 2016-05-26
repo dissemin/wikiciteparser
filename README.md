@@ -1,4 +1,4 @@
-wikiciteparser
+wikiciteparser [![Build Status](https://travis-ci.org/dissemin/wikiciteparser.svg)](https://travis-ci.org/dissemin/wikiciteparser)
 ==============
 
 [![PyPI](https://img.shields.io/pypi/v/wikiciteparser.svg)](https://pypi.python.org/pypi/wikiciteparser)

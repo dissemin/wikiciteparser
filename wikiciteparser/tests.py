@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import unittest
-from .parser import *
+from wikiciteparser.parser import *
 
 class ParsingTests(unittest.TestCase):
     def test_multiple_authors(self):
@@ -43,3 +43,8 @@ class ParsingTests(unittest.TestCase):
             parsed = parse_citation_template(tpl)
             print parsed
             self.assertIsInstance(parsed, dict) # because all templates in this example are citation templates
+
+
+if __name__ == '__main__':
+        unittest.main()
+
