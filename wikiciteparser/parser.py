@@ -6,6 +6,7 @@ import os
 import lupa
 import json
 import mwparserfromhell
+import importlib
 from time import sleep
 
 from . import en
@@ -128,7 +129,7 @@ def is_citation_template_name(template_name, lang='en'):
     template_name = template_name.strip()
     template_name = template_name[0].upper()+template_name[1:]
 
-    lang_module = __import__(lang)
+    lang_module = importlib.import_module('.' + lang, package='wikiciteparser')
     if template_name in lang_module.citation_template_names:
         return template_name
 
