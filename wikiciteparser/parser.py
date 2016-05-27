@@ -8,41 +8,15 @@ import json
 import mwparserfromhell
 from time import sleep
 
+from . import en
+from . import it
+
+
 lua = lupa.LuaRuntime()
 luacode = ''
 luafilepath = os.path.join(os.path.dirname(__file__), 'cs1.lua')
 with open(luafilepath, 'r') as f:
     luacode = f.read()
-
-# taken from https://en.wikipedia.org/wiki/Help:Citation_Style_1
-citation_template_names = set([
-    'Citation',
-    'Cite AV media',
-    'Cite AV media notes',
-    'Cite book',
-    'Cite conference',
-    'Cite DVD notes',
-    'Cite encyclopedia',
-    'Cite episode',
-    'Cite interview',
-    'Cite journal',
-    'Cite mailing list',
-    'Cite map',
-    'Cite news',
-    'Cite newsgroup',
-    'Cite podcast',
-    'Cite press release',
-    'Cite report',
-    'Cite serial',
-    'Cite sign',
-    'Cite speech',
-    'Cite techreport',
-    'Cite thesis',
-    'Cite web',
-    'Cite arXiv',
-    # TODO more could be added,
-    # see https://en.wikipedia.org/wiki/Category:Citation_Style_1_specific-source_templates
-    ])
 
 # MediaWiki utilities simulated by Python wrappers
 def lua_to_python_re(regex):
@@ -141,31 +115,35 @@ def params_to_dict(params):
         dct[param.name.strip()] = param.value.strip()
     return dct
 
-def is_citation_template_name(template_name):
+
+def is_citation_template_name(template_name, lang='en'):
     """
     Is this name the name of a citation template?
     If true, returns a normalized version of it. Otherwise, returns None
     """
     if not template_name:
         return False
+
     template_name = template_name.replace('_', ' ')
     template_name = template_name.strip()
     template_name = template_name[0].upper()+template_name[1:]
-    if template_name in citation_template_names:
+
+    lang_module = __import__(lang)
+    if template_name in lang_module.citation_template_names:
         return template_name
 
-def parse_citation_template(template):
+
+def parse_citation_template(template, lang='en'):
     """
     Takes a mwparserfromhell template object that represents
     a wikipedia citation, and converts it to a normalized representation
     as a dict.
 
-    :returns: a dict representing the template, or None if the template provided
-        does not represent a citation.
+    :returns: a dict representing the template, or None if the template
+        provided does not represent a citation.
     """
     name = unicode(template.name)
-    if not is_citation_template_name(name):
+    if not is_citation_template_name(name, lang):
         return
-    return parse_citation_dict(params_to_dict(template.params), template_name=name)
-
-
+    return parse_citation_dict(params_to_dict(template.params),
+                               template_name=name)
