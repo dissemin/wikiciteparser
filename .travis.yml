@@ -21,12 +21,12 @@ addons:
 virtualenv:
   system_site_packages: true
 
-before_install:
-  - export PYTHONPATH=$HOME/builds/dissemin/wikiciteparser
-
 install:
   - pip install -r requirements.txt
   - pip install coveralls
+
+before_script:
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 script:
   - coverage run --source=wikiciteparser wikiciteparser/tests.py -v 2
