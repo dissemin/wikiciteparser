@@ -29,7 +29,7 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 script:
-  - coverage run --source=wikiciteparser wikiciteparser/tests.py -v 2
+  - coverage run --source=wikiciteparser wikiciteparser/tests.py -v
 
 after_success:
   - coveralls
