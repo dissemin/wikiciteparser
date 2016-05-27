@@ -21,6 +21,9 @@ addons:
 virtualenv:
   system_site_packages: true
 
+before_install:
+  - export PYTHONPATH=$HOME/builds/dissemin/dissemin
+
 install:
   - pip install -r requirements.txt
   - pip install coveralls
