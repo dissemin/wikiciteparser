@@ -10,6 +10,7 @@ This is the underlying code of our ["OAbot"](https://tools.wmflabs.org/oabot/) (
 Distributed under the MIT license.
 
 Dependencies: lupa, mwparserfromhell
+To install lupa from pypi, you will need libpython and liblua (`libpython-dev` and `liblua5.2-dev` on debian-based systems).
 
 Example
 -------
