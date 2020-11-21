@@ -31,7 +31,7 @@ article <https://en.wikipedia.org/wiki/Joachim_Lambek>`__::
     wikicode = mwparserfromhell.parse(mwtext)
     for tpl in wikicode.filter_templates():
        parsed = parse_citation_template(tpl)
-       print parsed
+       print(parsed)
 
 Here is what you get::
 

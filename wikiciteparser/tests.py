@@ -148,7 +148,7 @@ class ParsingTests(unittest.TestCase):
         wikicode = mwparserfromhell.parse(mwtext)
         for tpl in wikicode.filter_templates():
             parsed = parse_citation_template(tpl, 'en')
-            print parsed
+            print(parsed)
             # All templates in this example are citation templates
             self.assertIsInstance(parsed, dict)
 
