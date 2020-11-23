@@ -143,7 +143,7 @@ def parse_citation_template(template, lang='en'):
     :returns: a dict representing the template, or None if the template
         provided does not represent a citation.
     """
-    name = unicode(template.name)
+    name = str(template.name)
     if not is_citation_template_name(name, lang):
         return
     return parse_citation_dict(params_to_dict(template.params),
