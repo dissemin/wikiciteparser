@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import re
 import os
 import lupa
@@ -25,10 +22,10 @@ def lua_to_python_re(regex):
     rx = re.sub('%c', '[\x7f\x80]', regex) # control chars
     rx = re.sub('%d', '[0-9]', rx) # digits
     rx = re.sub('%l', '[a-z]', rx) # lowercase letters
-    rx = re.sub('%p', '\\p{P}', rx) # punctuation chars
-    rx = re.sub('%s', '\\s', rx) # space chars
+    rx = re.sub('%p', '\\\\p{P}', rx) # punctuation chars
+    rx = re.sub('%s', '\\\\s', rx) # space chars
     rx = re.sub('%u', '[A-Z]', rx) # uppercase chars
-    rx = re.sub('%w', '\\w', rx) # alphanumeric chars
+    rx = re.sub('%w', '\\\\w', rx) # alphanumeric chars
     rx = re.sub('%x', '[0-9A-F]', rx) # hexa chars
     return rx
 
