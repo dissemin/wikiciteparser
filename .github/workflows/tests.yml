@@ -33,7 +33,7 @@ jobs:
         # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        coverage run --source=wikiciteparser wikiciteparser/tests.py -v
+        coverage run --source=wikiciteparser -m unittest wikiciteparser.tests -v
     - name: Submit coverage statistics to coverall
       run: |
         coveralls
