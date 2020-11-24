@@ -1,4 +1,4 @@
-wikiciteparser [![Build Status](https://travis-ci.com/dissemin/wikiciteparser.svg)](https://travis-ci.com/dissemin/wikiciteparser) [![PyPI](https://img.shields.io/pypi/v/wikiciteparser.svg)](https://pypi.python.org/pypi/wikiciteparser)
+wikiciteparser ![Python tests](https://github.com/dissemin/wikiciteparser/workflows/Python%20tests/badge.svg) [![PyPI](https://img.shields.io/pypi/v/wikiciteparser.svg)](https://pypi.python.org/pypi/wikiciteparser)
 ==============
 
 This Python library wraps Wikipedia's citation processing code (written in Lua) to
