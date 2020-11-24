@@ -1,10 +1,8 @@
 import re
 import os
 import lupa
-import json
 import mwparserfromhell
 import importlib
-from time import sleep
 
 from . import en
 from . import it
