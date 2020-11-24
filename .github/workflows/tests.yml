@@ -35,6 +35,7 @@ jobs:
       run: |
         coverage run --source=wikiciteparser -m unittest wikiciteparser.tests -v
     - name: Submit coverage statistics to coverall
-      env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         coveralls
