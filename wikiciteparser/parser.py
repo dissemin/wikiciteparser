@@ -93,6 +93,10 @@ def parse_citation_dict(arguments, template_name='citation'):
     :returns: a dictionary used as internal representation in wikipedia for rendering and export to other formats
     """
     arguments['_tpl'] = template_name
+    citation_class = template_name.strip().replace('Cite ', '').replace(' ', '-')
+    if citation_class == "Citation":
+        citation_class = "citation"
+    arguments['CitationClass'] = citation_class
     lua_table = lua.table_from(arguments)
     lua_result = lua.eval(luacode)(lua_table,
             ustring_match,
