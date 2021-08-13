@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 from wikiciteparser.parser import *
+from wikiciteparser.bulk import extract_file
 
 
 class ParsingTests(unittest.TestCase):
@@ -170,6 +171,13 @@ class ParsingTests(unittest.TestCase):
             },
             "CitationClass": "citation",
         })
+
+
+class BulkXMLTests(unittest.TestCase):
+    def test_basic_xml_parse(self):
+        revs = list(extract_file('wikiciteparser/test_files/bulk_dump_sample.xml.bz2'))
+        self.assertEqual(len(revs), 3)
+        self.assertEqual(len(revs[0]['refs']), 3)
 
 
 if __name__ == '__main__':
