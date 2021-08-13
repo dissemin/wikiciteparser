@@ -1,2 +1,4 @@
 lupa
 mwparserfromhell
+mwxml
+mwtypes
