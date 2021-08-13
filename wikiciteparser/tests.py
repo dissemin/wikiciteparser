@@ -147,10 +147,29 @@ class ParsingTests(unittest.TestCase):
         """
         wikicode = mwparserfromhell.parse(mwtext)
         for tpl in wikicode.filter_templates():
-            parsed = parse_citation_template(tpl, 'en')
+            parsed = parse_citation_template(tpl, lang='en')
             print(parsed)
             # All templates in this example are citation templates
             self.assertIsInstance(parsed, dict)
+            last = parsed
+
+        self.assertEqual(last, {
+            "Authors": [
+                {'first': 'Joachim', 'last': 'Lambek', 'link': 'Joachim Lambek'},
+            ],
+            "Date": "1979",
+            "Pages": "221-234",
+            "Title": "A mathematician looks at Latin conjugation",
+            "Periodical": "Theoretical Linguistics",
+            "Volume": "6",
+            "Issue": "2",
+            "ID_list": {
+                "DOI": "10.1515/thli.1979.6.1-3.221",
+                "ISSN": "0301-4428",
+                "MR": "589163",
+            },
+            "CitationClass": "citation",
+        })
 
 
 if __name__ == '__main__':
