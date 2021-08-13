@@ -4954,10 +4954,12 @@ Date validation supporting code is in Module:Citation/CS1/Date_validation
         ['Edition'] = Edition,
         ['PublisherName'] = PublisherName,
         ['URL'] = first_set ({ChapterURL, URL}, 2),
+        ['AccessDate'] = AccessDate,
         ['Format'] = Format,
         ['Authors'] = coins_author,
         ['ID_list'] = ID_list,
         ['RawPage'] = this_page.prefixedText,
+        ['CitationClass'] = config.CitationClass,
     }; -- , config.CitationClass);
 
 end
