@@ -18,9 +18,9 @@ Output is JSON lines on stdout, with one line per page revision. JSON keys:
     refs (array of parsed references)
 """
 
-import sys
 import json
 import argparse
+from typing import Iterator
 
 import mwxml
 import mwtypes
@@ -58,7 +58,7 @@ def extract_file(xml_file_path):
     site_name = dump.site_info.dbname
 
     for page in dump.pages:
-        if (not page.namespace in [0, "0"]) or page.redirect:
+        if (page.namespace not in [0, "0"]) or page.redirect:
             # print(f"SKIPPED: [{page.namespace}] {page.title} redirect={page.redirect}", file=sys.stderr)
             continue
         for revision in page:
