@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 import unittest
-from wikiciteparser.parser import *
+
+from wikiciteparser.parser import parse_citation_dict, parse_citation_template
 from wikiciteparser.bulk import extract_file
 
 
@@ -181,4 +182,4 @@ class BulkXMLTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-        unittest.main()
+    unittest.main()
