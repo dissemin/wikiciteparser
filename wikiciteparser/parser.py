@@ -127,21 +127,26 @@ def params_to_dict(params):
     return dct
 
 
-def is_citation_template_name(template_name, lang='en'):
+def citation_class_for_template(template_name, lang='en'):
     """
-    Is this name the name of a citation template?
-    If true, returns a normalized version of it. Otherwise, returns None
+    Normalizes template name, checks if it is supported, and returns the CS1
+    CitationClass name if it is.
+
+    Otherwise, returns None
     """
     if not template_name:
-        return False
+        return None
 
+    # first normalize the template name: eg, capitalize
     template_name = template_name.replace('_', ' ')
     template_name = template_name.strip()
-    template_name = template_name[0].upper()+template_name[1:]
+    if len(template_name) >= 2:
+        template_name = template_name[0].upper()+template_name[1:]
+    elif len(template_name) == 1:
+        template_name = template_name[0].upper()
 
     lang_module = importlib.import_module('.' + lang, package='wikiciteparser')
-    if template_name in lang_module.citation_template_names:
-        return template_name
+    return lang_module.citation_template_classes.get(template_name, None)
 
 
 def parse_citation_template(template, lang='en'):
@@ -153,8 +158,10 @@ def parse_citation_template(template, lang='en'):
     :returns: a dict representing the template, or None if the template
         provided does not represent a citation.
     """
-    name = str(template.name)
-    if not is_citation_template_name(name, lang):
+    class_name = citation_class_for_template(str(template.name), lang)
+    if not class_name:
         return
-    return parse_citation_dict(params_to_dict(template.params),
-                               template_name=name)
+    return parse_citation_dict(
+        params_to_dict(template.params),
+        template_name=class_name,
+    )
