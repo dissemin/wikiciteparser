@@ -26,6 +26,18 @@ citation_template_names = set([
     'Cite thesis',
     'Cite web',
     'Cite arXiv',
+    'London Gazette',
+    'Harvnb',
+    'Harvard citation no brackets',
+    'NRISref',
+    'Cite gnis',
+    'GNIS',
+    'GEOnet3',
+    'Timatic Visa Policy',
+    'Soccerbase season',
+    'Cite sports-reference',
+    'NHLE',
+    'National Heritage List for England'
     # TODO more could be added,
     # see https://en.wikipedia.org/wiki/
     #    Category:Citation_Style_1_specific-source_templates

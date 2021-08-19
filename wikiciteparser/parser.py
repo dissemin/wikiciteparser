@@ -102,6 +102,8 @@ def parse_citation_dict(arguments, template_name='citation'):
     citation_class = template_name.strip().replace('Cite ', '').replace(' ', '-')
     if citation_class == "Citation":
         citation_class = "citation"
+    if template_name in ['Gazette', 'Harvnb', 'NRISref', 'GNIS', 'GEOnet3', 'Policy', 'NHLE', 'England']:
+        template_name = template_name.lower()
     arguments['CitationClass'] = citation_class
     lua_table = lua.table_from(arguments)
     lua_result = lua.eval(luacode)(
