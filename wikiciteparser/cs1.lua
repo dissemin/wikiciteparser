@@ -913,8 +913,10 @@ is handled in the main module.
 ]]
 
 local templates_using_volume = {'citation', 'audio-visual', 'book', 'conference', 'encyclopaedia', 'interview', 'journal', 'magazine', 'map', 'news', 'report', 'techreport'}
-local templates_using_issue = {'citation', 'conference', 'episode', 'interview', 'journal', 'magazine', 'map', 'news'}
+local templates_using_issue = {'citation', 'conference', 'episode', 'interview', 'journal', 'magazine', 'map', 'news', 'gazette'}
 local templates_not_using_page = {'audio-visual', 'episode', 'mailinglist', 'newsgroup', 'podcast', 'serial', 'sign', 'speech'}
+local templates_using_accessdate = {'nrisref', 'gnis', 'policy', 'season', 'sports-reference', 'nhle', 'england'}
+local templates_using_series_no_as_id = {'nrisref', 'gnis', 'geonet3', 'season', 'nhle', 'england'}
 
 
 
@@ -2594,6 +2596,7 @@ local function argument_wrapper( args )
     },
     {
         __index = function ( tbl, k )
+
             if origin[k] ~= nil then
                 return nil;
             end
@@ -2618,7 +2621,7 @@ local function argument_wrapper( args )
                 v = cfg.defaults[k] or '';
                 origin[k] = '';
             end
-            
+
             tbl = rawset( tbl, k, v );
             return v;
         end,
@@ -4353,13 +4356,165 @@ This is the main function doing the majority of the citation formatting.
 
 ]]
 
+local function get_sorted_keys(args)
+    local keyset={}
+    local n=0
+    for k,_ in pairs(args) do
+        table.insert(keyset, k)
+    end
+    table.sort(keyset)
+    return keyset
+end
+
 local function citation0( config, args)
     --[[ 
     Load Input Parameters
     The argument_wrapper facilitates the mapping of multiple aliases to single internal variable.
     ]]
+
+    -- This is for the new template
+    local exception_citation_tmpl = {'harvnb', 'brackets'}
+    local maps_citation_tmpl = {'gnis', 'geonet3'}
+    local heritage_england_citation_tmpl = {'nhle', 'england'}
+
+    if in_array(config.CitationClass, exception_citation_tmpl) then
+        local keyset = get_sorted_keys(args)
+        for i,k in ipairs(keyset) do
+            if tonumber(k) ~= nil then
+                v = args[k]
+                -- Checks if the year is a number or alphanumeric since the format can be 2007 or 2007a
+                if (tonumber(v) ~= nil) or (string.find(v, "%d") and true or false) then
+                    args["year"] = args[k]
+                    args[k] = nil
+                elseif type(v) == 'string' then
+                    args["last" .. k] = args[k]
+                    args[k] = nil
+                end
+            end
+        end
+    end
+
+    -- This is for chaning the version section of nrisref citation template to series and change other names
+    if 'nrisref' == config.CitationClass then
+        local keyset = get_sorted_keys(args)
+        for i,k in ipairs(keyset) do
+            if k == 'name' then
+                args["title"] = args[k]
+                args[k] = nil
+            end
+            if k == 'refnum' then
+                args["seriesno"] = args[k]
+                args[k] = nil
+            end
+            if tonumber(k) ~= nil or k == 'version' then
+                if (string.find(args[k], "%d") and true or false) then
+                    args["series"] = args[k]
+                    args[k] = nil
+                end
+            end
+        end
+    end
+
+    if in_array(config.CitationClass, maps_citation_tmpl) then
+        local keyset = get_sorted_keys(args)
+        for i,k in ipairs(keyset) do
+            if tonumber(k) ~= nil then
+                v = args[k]
+                if (tonumber(v) ~= nil) then
+                    args['seriesno'] = args[k]
+                    args[k] = nil
+                else
+                    date_or_not,_ = check_date(args[k], nil)
+                    if date_or_not then
+                        args["accessdate"] = args[k]
+                        args[k] = nil
+                    else
+                        args["title"] = args[k]
+                        args[k] = nil
+                    end
+                end
+            else
+                if k == 'id' then
+                    args['seriesno'] = args[k]
+                    args[k] = nil
+                end
+                if k == 'name' then
+                    args["title"] = args[k]
+                    args[k] = nil
+                end
+            end
+        end
+    end
+
+    if config.CitationClass == 'season' then
+        local keyset = get_sorted_keys(args)
+        for i,k in ipairs(keyset) do
+            if tonumber(k) ~= nil  then
+                v = args[k]
+                date_or_not,_ = check_date(args[k], nil)
+                if date_or_not then
+                    args["year"] = args[k]
+                    args[k] = nil
+                else
+                    args["seriesno"] = args[k]
+                    args[k] = nil
+                end
+            else
+                if k == 'id' then
+                    args['seriesno'] = args[k]
+                    args[k] = nil
+                end
+                if k == 'name' then
+                    args["title"] = args[k]
+                    args[k] = nil
+                end
+                if k == 'season' then
+                    args["year"] = args[k]
+                    args[k] = nil
+                end
+            end
+        end
+    end
+
+    if config.CitationClass == 'sports-reference' then
+        local keyset = get_sorted_keys(args)
+        for i,k in ipairs(keyset) do
+            if k == '1' then
+                args['title'] = args[k]
+                args[k] = nil
+            end
+            if k == '2' then
+                args["url"] = args[k]
+                args[k] = nil
+            end
+            if k == '3' then
+                args["accessdate"] = args[k]
+                args[k] = nil
+            end
+        end
+    end
+
+    if in_array(config.CitationClass, heritage_england_citation_tmpl) then
+        local keyset = get_sorted_keys(args)
+        for i,k in ipairs(keyset) do
+            if tonumber(k) ~= nil then
+                args['seriesno'] = args[k]
+                args[k] = nil
+            else
+                if k == 'num' then
+                    args['seriesno'] = args[k]
+                    args[k] = nil
+                end
+                if k == 'desc' then
+                    args["title"] = args[k]
+                    args[k] = nil
+                end
+            end
+        end
+    end
+
     local A = argument_wrapper( args );
-    local i 
+    local i
 
     -- Pick out the relevant fields from the arguments.  Different citation templates
     -- define different field names for the same underlying things. 
@@ -4465,9 +4620,9 @@ local function citation0( config, args)
     local ConferenceURLorigin = A:ORIGIN('ConferenceURL');                      -- get name of parameter that holds ConferenceURL
     local Periodical = A['Periodical'];
     local Periodical_origin = A:ORIGIN('Periodical');                           -- get the name of the periodical parameter
-
     local Series = A['Series'];
     
+    local City;                                                                 -- Added the City for London Gazette citation
     local Volume;
     local Issue;
     local Page;
@@ -4477,6 +4632,7 @@ local function citation0( config, args)
     if in_array (config.CitationClass, cfg.templates_using_volume) and not ('conference' == config.CitationClass and not is_set (Periodical)) then
         Volume = A['Volume'];
     end
+
     if in_array (config.CitationClass, cfg.templates_using_issue) and not (in_array (config.CitationClass, {'conference', 'map'}) and not is_set (Periodical))then
         Issue = A['Issue'];
     end
@@ -4502,7 +4658,13 @@ local function citation0( config, args)
         end
 
     local Via = A['Via'];
-    local AccessDate = A['AccessDate'];
+
+    local AccessDate;
+    -- This is just for templates which want to have accessdate
+    if in_array(config.CitationClass, templates_using_accessdate) then
+        AccessDate = A['AccessDate']
+    end
+
     local ArchiveDate = A['ArchiveDate'];
     local Agency = A['Agency'];
     local DeadURL = A['DeadURL']
@@ -4616,6 +4778,7 @@ When the citation has these parameters:
 All other combinations of |encyclopedia, |title, and |article are not modified
 
 ]]
+
 
 local Encyclopedia = A['Encyclopedia'];
 
@@ -4757,8 +4920,9 @@ local Encyclopedia = A['Encyclopedia'];
             Date = AirDate;
         end
 
+        local Season;
         if 'episode' == config.CitationClass then                               -- handle the oddities that are strictly {{cite episode}}
-            local Season = A['Season'];
+            Season = A['Season'];
             local SeriesNumber = A['SeriesNumber'];
 
             if is_set (Season) and is_set (SeriesNumber) then                   -- these are mutually exclusive so if both are set
@@ -4934,6 +5098,22 @@ Date validation supporting code is in Module:Citation/CS1/Date_validation
         coins_author = c;                                                       -- use that instead
     end
 
+    -- This is just for Gazette since the cities in Gazette represent the particular Gazette which could be linked to other cities
+    if config.CitationClass == 'gazette' then
+        local city_names = {['b'] = 'Belfast', ['belfast'] = 'Belfast', ['e'] = 'Edinburgh', ['edinburgh'] = 'Edinburgh'};
+        City = A['City'] and A['City']:lower();                              -- lower() to index into the city_names table
+        City = city_names[City] or 'London';                                  -- the city, or default to London
+    end
+
+    if in_array(config.CitationClass, templates_using_series_no_as_id) then
+        SeriesNumber = A['SeriesNumber']
+    end
+
+    -- The type only exists for map types which are present in antartic and for this specific citation
+    if config.CitationClass == 'gnis' then
+        TitleType = A['TitleType']
+    end
+
     -- this is the function call to COinS()
     --local OCinSoutput = COinS({
     return {
@@ -4945,20 +5125,23 @@ Date validation supporting code is in Module:Citation/CS1/Date_validation
         ['Title'] = make_coins_title (coins_title, ScriptTitle),                -- Title and ScriptTitle stripped of bold / italic wikimarkup
         ['PublicationPlace'] = PublicationPlace,
         ['Date'] = COinS_date.rftdate,                                          -- COinS_date has correctly formatted date if Date is valid;
-        ['Season'] = COinS_date.rftssn,
+        ['Season'] = Season,
         ['Chron'] =  COinS_date.rftchron or (not COinS_date.rftdate and Date) or '',    -- chron but if not set and invalid date format use Date; keep this last bit?
         ['Series'] = Series,
         ['Volume'] = Volume,
+        ['City'] = City,
         ['Issue'] = Issue,
         ['Pages'] = get_coins_pages (first_set ({Sheet, Sheets, Page, Pages, At}, 5)),              -- pages stripped of external links
         ['Edition'] = Edition,
         ['PublisherName'] = PublisherName,
         ['URL'] = first_set ({ChapterURL, URL}, 2),
-        ['AccessDate'] = AccessDate,
         ['Format'] = Format,
         ['Authors'] = coins_author,
         ['ID_list'] = ID_list,
         ['RawPage'] = this_page.prefixedText,
+        ['AccessDate'] = AccessDate,
+        ['SeriesNumber'] = SeriesNumber,
+        ['TitleType'] = TitleType,
         ['CitationClass'] = config.CitationClass,
     }; -- , config.CitationClass);
 
@@ -5700,10 +5883,11 @@ local function cite_args(orig_args)
     local error_text, error_state;
 
     local config = {};
+
     for k, v in pairs( orig_args ) do
         config[k] = v;
         args[k] = v;       
-    end 
+    end
 
     local capture;                                                              -- the single supported capture when matching unknown parameters using patterns
     for k, v in pairs( orig_args ) do
@@ -5737,6 +5921,7 @@ local function cite_args(orig_args)
             has_invisible_chars (k, v);
         end
     end
+
     return citation0( config, args)
 end
 
