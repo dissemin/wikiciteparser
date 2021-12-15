@@ -9,11 +9,20 @@ This is the underlying code of our ["OAbot"](https://tools.wmflabs.org/oabot/) (
 
 Distributed under the MIT license.
 
-Dependencies: lupa, mwparserfromhell
-To install lupa from pypi, you will need libpython and liblua (`libpython-dev` and `liblua5.2-dev` on debian-based systems).
+Builds on these Python libraries:
 
-Example
--------
+- `lupa`
+- `mwparserfromhell`
+- `mwxml`
+- `mwtypes`
+
+To install `lupa` from pypi.org, you will need libpython and liblua (`libpython-dev` and `liblua5.2-dev` on Debian-base Linux systems).
+
+Install this package with `pip` (eg, in a virtual environment):
+
+    pip install wikiciteparser
+
+## Examples
 
 Let's parse the reference section of [this article](https://en.wikipedia.org/wiki/Joachim_Lambek):
 
@@ -43,4 +52,12 @@ Here is what you get:
     {'Title': 'A mathematician looks at Latin conjugation', 'ID_list': {'DOI': '10.1515/thli.1979.6.1-3.221', 'ISSN': '0301-4428', 'MR': '589163'}, 'Periodical': 'Theoretical Linguistics', 'Authors': [{'link': 'Joachim Lambek', 'last': 'Lambek', 'first': 'Joachim'}], 'Date': '1979', 'Pages': '221-234'}
 
 
+## Bulk Processing
 
+There is also a bulk processing mode that can work with [bulk XML files from dumps.wikimedia.org](https://dumps.wikimedia.org/backup-index.html).
+
+With `wikiciteparser` installed (or in the current python path), run a UNIX shell command like:
+
+    python3 -m wikiciteparser.bulk enwiki-20210801-pages-articles1.xml-p1p41242.bz2 | pv -l | gzip > enwiki-20210801-pages-articles1.xml-p1p41242.citations.json.gz
+
+GNU/parallel can be used to run process many files concurrently on a single computer.
