@@ -29,7 +29,6 @@ setup(
 
     # Author details
     author='Antonin Delpeuch',
-    author_email='first_name@last_name.eu',
 
     # Choose your license
     license='MIT',
