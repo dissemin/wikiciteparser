@@ -8,7 +8,7 @@ import importlib
 lua = lupa.LuaRuntime()
 luacode = ''
 luafilepath = os.path.join(os.path.dirname(__file__), 'cs1.lua')
-with open(luafilepath, 'r') as f:
+with open(luafilepath, 'r', encoding='utf8') as f:
     luacode = f.read()
 
 
